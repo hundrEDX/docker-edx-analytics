@@ -1,0 +1,23 @@
+pipeline:
+#  image: ionisx/hadoop:2.3.0
+  build: edx-analytics-pipeline/
+  command: start-hadoop.sh
+  ports:
+   - "9001:9000"
+dataapi:
+  build: edx-analytics-data-api/
+  command: /opt/edx-analytics-data-api/manage.py runserver 0.0.0.0:8000
+  links:
+   - pipeline
+  ports:
+   - "8000:8000"
+dashboard:
+  build: edx-analytics-dashboard/
+  command: /opt/edx-analytics-dashboard/analytics_dashboard/manage.py runserver 0.0.0.0:9000
+  links:
+   - dataapi
+   - mysql
+  ports:
+   - "9000:9000"
+mysql:
+  image: mysql:5.6
